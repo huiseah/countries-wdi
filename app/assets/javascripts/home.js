@@ -3,7 +3,9 @@ var offset = 0;
 var finished = false;
 
 function populateCountries() {
-    if (finished == true) {return};
+    if (finished == true) {
+        return;
+    };
     var step = parseInt($('#step-input').val());
     var template_f = Handlebars.compile($('#country_template').html());
     var $posts = $('#content');
@@ -11,16 +13,22 @@ function populateCountries() {
         url: '/countries/' + step + '/' + offset + '/',
         datatype: 'JSON'
     }).done(function (results) {
-        $.each(results, function (i, render) {
-            $posts.append(template_f(render));
-        });
-        console.log('step: ' + step + ' & offset: ' + offset);
-        offset = offset + step;
-        console.log('step: ' + step + ' & offset: ' + offset);
+        if (results.length <= 0) {
+            finished = true;
+        };
+            $.each(results, function (i, render) {
+                $posts.append(template_f(render));
+            });
+            console.log('step: ' + step + ' & offset: ' + offset);
+            offset = offset + step;
+            console.log('step: ' + step + ' & offset: ' + offset);
     });
 };
 
 function populateAll() {
+    if (finished == true) {
+        return;
+    };
     var step = 1000;
     var template_f = Handlebars.compile($('#country_template').html());
     var $posts = $('#content');
@@ -28,9 +36,7 @@ function populateAll() {
         url: '/countries/' + step + '/' + offset + '/',
         datatype: 'JSON'
     }).done(function (results) {
-            if (results.length == 0) {
                 finished = true;
-            };
             $.each(results, function (i, render) {
                     $posts.append(template_f(render));
                 });
@@ -44,11 +50,12 @@ function populateAll() {
         $('#populate-button').click(populateCountries);
         $('#all-button').click(populateAll);
         $('#reset-button').click(function () {
-            step = 0;
+            step = 10;
             offset = 0;
+            finished = false;
             // this function resets the button and scroll bindings, and sets pointer to 0
             pointer = 0;
-            $('#step-input').val('');
+            $('#step-input').val('10');
             $('#content').html('');
             $(window).unbind('scroll').scroll(scrollFunction);
             $('#populate-button').unbind('click').click(populateCountries);
